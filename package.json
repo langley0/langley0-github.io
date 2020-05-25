@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "ts-node ./generator/src/index.ts build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "serve": "ts-node ./generator/src/index.ts serve"
   },
   "repository": {
     "type": "git",
