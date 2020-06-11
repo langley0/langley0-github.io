@@ -1,0 +1,21 @@
+name: Build Post
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Run a build process
+      run: |
+        npm install
+        npm run build
+        
+    - name: Upload generated posts
+      uses: actions/upload-artifact@v1
+      with:
+        name: blog
+        path: ./
+        
