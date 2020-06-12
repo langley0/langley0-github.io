@@ -10,8 +10,8 @@ jobs:
 
     - name: Run a build process
       run: |
-        npm install
-        npm run prepare
+        npm install --prefix ./generator/
+        npm run tsc --prefix ./generator/
         npm run build:js
         
     - name: Upload generated posts
