@@ -16,6 +16,8 @@ jobs:
         
     - name: Add to repository
       run: |
+        git config --global user.email "langley0@naver.com"
+        git config --global user.name "langley0"
         git add -A
         git commit -am "Automated build"
         git push
