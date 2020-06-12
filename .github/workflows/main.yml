@@ -11,7 +11,7 @@ jobs:
     - name: Run a build process
       run: |
         npm install
-        npm run tsc
+        npm run prepare
         npm run build:js
         
     - name: Upload generated posts

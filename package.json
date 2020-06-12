@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "tsc": "tsc",
+    "prepare": "cd generator & npm install & tsc & cd..",
     "build:js": "node ./generator/dist/index.js build",
     "build": "tsc ./generator/src/index.ts build",
     "serve": "ts-node ./generator/src/index.ts serve"
@@ -19,7 +19,5 @@
     "url": "https://github.com/langley0/langley0-github.io/issues"
   },
   "homepage": "https://github.com/langley0/langley0-github.io#readme",
-  "dependencies": {
-    "typescript": "^3.9.5"
-  }
+  "dependencies": {}
 }
