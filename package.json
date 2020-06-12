@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "ts-node ./generator/src/index.ts build",
+    "tsc": "tsc",
+    "build:js": "node ./generator/dist/index.js build",
+    "build": "tsc ./generator/src/index.ts build",
     "serve": "ts-node ./generator/src/index.ts serve"
   },
   "repository": {
@@ -16,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/langley0/langley0-github.io/issues"
   },
-  "homepage": "https://github.com/langley0/langley0-github.io#readme"
+  "homepage": "https://github.com/langley0/langley0-github.io#readme",
+  "dependencies": {
+    "typescript": "^3.9.5"
+  }
 }
