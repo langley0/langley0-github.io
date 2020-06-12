@@ -14,9 +14,10 @@ jobs:
         npm run tsc --prefix ./generator/
         npm run build:js
         
-    - name: Upload generated posts
-      uses: actions/upload-artifact@v1
-      with:
-        name: blog
-        path: ./
+    - name: Add to repository
+      run: |
+        git add -A
+        git commit -am "Automated build"
+        git push
+      
         
