@@ -6,7 +6,7 @@
   "scripts": {
     "prepare": "cd generator & npm install & tsc & cd ..",
     "build:js": "node ./generator/dist/index.js build",
-    "build": "tsc ./generator/src/index.ts build",
+    "build": "ts-node ./generator/src/index.ts build",
     "serve": "ts-node ./generator/src/index.ts serve"
   },
   "repository": {
