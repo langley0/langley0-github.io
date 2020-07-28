@@ -1,5 +1,5 @@
 ---
-title: [Typescript]  unknown 과 never 를 이용해 라이브러리 만들어보기
+title: unknown 과 never 활용해보기
 author: langley
 ---
 
