@@ -19,9 +19,13 @@ jobs:
         with:
           ref: 'dev'
 
-      - name: get maker project
-        run: git clone https://github.com/langley0/blogmaker.git maker
-
+      - uses: actions/checkout@v2
+        with:
+          repository: https://github.com/langley0/blogmaker.git
+          ref: master
+          submodules: true
+          path: maker
+          
       - name: build maker
         run: |
           cd maker
