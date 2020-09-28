@@ -45,6 +45,7 @@ jobs:
       - name: confirm
         run: |
           cd dist
-          git add -A
-          git commit -m 'update post'
+          git config --local user.email "langley0@github.com"
+          git config --local user.name "langley0"
+          git commit -m 'update post' -a
           git push
