@@ -21,11 +21,11 @@ jobs:
 
       - uses: actions/checkout@v2
         with:
-          repository: https://github.com/langley0/blogmaker.git
+          repository: langley0/blogmaker.git
           ref: master
           submodules: true
           path: maker
-          
+
       - name: build maker
         run: |
           cd maker
