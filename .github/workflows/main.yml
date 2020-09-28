@@ -18,23 +18,24 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: 'dev'
+          path: src
 
       - uses: actions/checkout@v2
         with:
           repository: langley0/blogmaker.git
           ref: master
           submodules: true
-          path: ../maker
+          path: maker
 
       - name: build maker
         run: |
-          cd ../maker
+          cd maker
           npm install
           npm run build
+          ls ..
       - name: build html
         run: |
-          node ./dist/src/build.js ../langley0.github.io ../dist
+          node ./dist/src/build.js ../src ../dist
       - name: confirm
         run: |
-          cd ..
-          ls dist
+          ls ../dist
