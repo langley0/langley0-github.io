@@ -44,4 +44,7 @@ jobs:
 
       - name: confirm
         run: |
-          ls dist
+          cd dist
+          git add -A
+          git commit -m 'update post'
+          git push
