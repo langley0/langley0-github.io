@@ -19,6 +19,7 @@ jobs:
         with:
           ref: 'dev'
 
+
       - uses: actions/checkout@v2
         with:
           repository: langley0/blogmaker.git
@@ -28,8 +29,8 @@ jobs:
 
       - name: build maker
         run: |
-          cd maker
           ls
+          cd maker
           npm install
           npm run build
       - name: build html
