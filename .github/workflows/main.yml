@@ -34,6 +34,8 @@ jobs:
       - name: build html
         run: |
           cd ..
-          node ./maker/dist/src/build.js . dist
+          node ./langley0.github.io/maker/dist/src/build.js . dist
       - name: confirm
-        run: ls dist
+        run: |
+          pwd
+          ls dist
