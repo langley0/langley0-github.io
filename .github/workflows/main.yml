@@ -32,9 +32,14 @@ jobs:
           cd maker
           npm install
           npm run build
+      
       - name: build html
         run: |
           node ./maker/dist/src/build.js src dist
+          cd src
+          git checkout master
+          cp -ar ../dist/. ./
+
       - name: confirm
         run: |
-          ls dist
+          ls src
