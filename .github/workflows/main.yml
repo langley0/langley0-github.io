@@ -19,25 +19,22 @@ jobs:
         with:
           ref: 'dev'
 
-
       - uses: actions/checkout@v2
         with:
           repository: langley0/blogmaker.git
           ref: master
           submodules: true
-          path: maker
+          path: ../maker
 
       - name: build maker
         run: |
-          ls
-          cd maker
+          cd ../maker
           npm install
           npm run build
       - name: build html
         run: |
-          cd ..
-          node ./langley0.github.io/maker/dist/src/build.js . dist
+          node ./dist/src/build.js ../langley0.github.io ../dist
       - name: confirm
         run: |
-          pwd
+          cd ..
           ls dist
