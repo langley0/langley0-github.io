@@ -32,10 +32,9 @@ jobs:
           cd maker
           npm install
           npm run build
-          ls ..
       - name: build html
         run: |
-          node ./dist/src/build.js ../src ../dist
+          node ./maker/dist/src/build.js src dist
       - name: confirm
         run: |
-          ls ../dist
+          ls dist
