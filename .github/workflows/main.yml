@@ -25,6 +25,7 @@ jobs:
       - name: build maker
         run: |
           cd maker
+          npm install
           npm run build
       - name: build html
         run: |
