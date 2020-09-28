@@ -1,0 +1,338 @@
+<html>
+  <head>
+    <meta charSet="utf-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no"></meta>
+    <link rel="stylesheet" href="../base.css"/>
+    <link rel="stylesheet" href="../markdown.css"/>
+    <link rel="stylesheet" href="../highlight.css"/>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrapper">
+        <nav class="site-nav">
+          <div class="trigger">
+            <a class="page-link" href="../">home</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+          <header class="post-header">
+            <h1 class="post-title">React.PureComponent</h1>
+            <p></p>
+          </header>
+          <div class="articlebox">
+            <div class="markdown-body">
+            <h1>
+              PureComponent란?
+            </h1>
+            <p>
+              React에서는 3가지 Component들이 존재한다.
+            </p>
+            <ul>
+              <li>
+                React.Component
+              </li>
+            </ul>
+            <pre class="hljs codebox">
+            <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Ryuk</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span> </span>{
+              render() {
+                <span class="hljs-keyword">return</span>(
+                  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+                    안냐세여
+                  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+                )
+              }
+            }
+            </pre>
+            <ul>
+              <li>
+                React.PureComponent
+              </li>
+            </ul>
+            <pre class="hljs codebox">
+            <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Ryuk</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">PureComponent</span> </span>{
+              render() {
+                <span class="hljs-keyword">return</span>(
+                  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+                    안냐세여
+                  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+                )
+              }
+            }
+            </pre>
+            <ul>
+              <li>
+                Function Component
+              </li>
+            </ul>
+            <pre class="hljs codebox">
+            <span class="hljs-keyword">const</span> Ryuk = <span class="hljs-function">() =&gt;</span> {
+              <span class="hljs-keyword">return</span> (
+                <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+                  안냐세여
+                <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+              );
+            };
+            </pre>
+            <p>
+              각 컴포넌트들의  세세한 특징들이 있겠지만, 우리는
+              <code>PureComponent</code>
+              와
+              <code>Component</code>
+              의 차이만 간단하게 짚어보자. 열심히 검색을 하다보면
+              <strong>두 컴포넌트의 차이는 shouldComponentUpdate() 라이프 사이클</strong>
+              이라는 답을 찾을 수 있을 것이다.
+            </p>
+            <ul>
+              <li>
+                <strong>React.PureComponent는 React.Component에 shouldComponentUpdate()가 적용된 버전이다.</strong>
+              </li>
+            </ul>
+            <p>
+              (엄밀히 말하면
+              <strong>shouldComponentUpdate()</strong>
+              안에
+              <strong>얕은비교</strong>
+              가 적용된 버전이다.)
+            </p>
+            <h3>
+              아직 만들지도 않았는데.. 내 웹이 버벅거리네 ㅎㅎ
+            </h3>
+            <p>
+              React의 state를 사용 하던, 좀 더 구조화해서 사용할 수 있는 redux를 사용하던, 좀 더 쉽게 쓸 수 있는 mobx 를  사용하던, 우리는 state가 변경 될 때마다 컴포넌트들이 다시 render 되는 모습을 볼 수 있다.
+            </p>
+            <p>
+              <img src="Component.gif" alt="Component.gif"/>
+            </p>
+            <p>
+              정신 없어 보이지만, 자식1 을 고쳐도 부모, 자식2 가 함께 Re-render 되는 모습이다. (console.error가 3개씩)
+            </p>
+            <p>
+              위의 gif 처럼
+              <strong>자식2</strong>
+              <strong>(두 번째 Input창)</strong>
+              의 값이 변경 되지 않아도,
+              <strong>자식1의 변경</strong>
+              으로 인하여 Re-render되는 형상이 가볍게만 느껴지지 않는다. 혹여 render하면서 반응형을 체크 하거나, 또 그 하위 자식들이 많을 경우 이는 분명 성능 문제를 일으킬 것이다.
+            </p>
+            <h3>
+              그래서.. PureComponent란 말이다.
+            </h3>
+            <p>
+              위에서 언급했듯이 PureComponent는 Component
+              <strong>shouldComponentUpdate()</strong>
+              안에
+              <code>얕은 비교</code>
+              가 적용된 버전이다.
+            </p>
+            <p>
+              <strong>얕은 비교 (shallow-compare)</strong>
+            </p>
+            <p>
+              PureComponent는 shouldComponentUpdate() 라이프 사이클에서 얕은 비교를 통해 업데이트 여부를 결정한다.
+            </p>
+            <ul>
+              <li>
+                변수와 문자열에서는 값을 비교한다.
+              </li>
+              <li>
+                객체에서는 reference 값을 비교한다.
+              </li>
+            </ul>
+            <pre class="hljs codebox">
+            **shouldComponentUpdate() {
+              <span class="hljs-keyword">if</span>(아니 그래서 너 진짜 바뀌었니?) {
+                그렇다면 render() 하렴;
+              } <span class="hljs-keyword">else</span> {
+                그렇다면 render 하지마렴;
+              }
+            }**
+            </pre>
+            <p>
+              즉, 우리가 직접 shouldComponentUpdate 에서 변경 여부를 확인하고 Re-render 여부를 결정 지을 수 있지만 그렇기에는 공수가 많이 들기 때문에 PureComponent가 생겨났고, 언제부턴가
+              <strong>'잘 모르면 그냥 PureComponent써..'</strong>
+              라는 말이 생겨난 것 같다.
+            </p>
+            <h3>
+              1차 정리
+            </h3>
+            <ul>
+              <li>
+                PureComponent는 변경 된 사항을 자동으로 체크하고, Re-render 여부를 결정지어준다. 물론, 이는 우리가 일반 Component를 사용하고, shouldComponentUpdate() 라이프 사이클에서 정의 할 수 있다.
+              </li>
+              <li>
+                state를 잘 못 사용하면, 유저의 자그마한 손 짓 하나에 우리의 웹이 다시 render 되는 매직을 볼 수 있다. 그렇기에 우리는 Component의 역할을 잘 분리해야하고, PureComponent를 잘 활용해야한다.
+              </li>
+            </ul>
+            <h1>
+              좋아. 그럼 언제 써야하나?
+            </h1>
+            <p>
+              <img src="2020-06-01__6.26.45.png" alt="2020-06-01__6.26.45.png"/>
+            </p>
+            <p>
+              <img src="2020-06-01__6.23.29.png" alt="2020-06-01__6.23.29.png"/>
+            </p>
+            <pre class="hljs codebox">
+            @observer
+            <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Parent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span> </span>{
+              @observable compoOneValue = <span class="hljs-string">&quot;&quot;</span>;
+              @observable compoTwoValue = <span class="hljs-string">&quot;&quot;</span>;
+            
+              onChangeCompoOne = <span class="hljs-function">(<span class="hljs-params">event: React.FormEvent&lt;HTMLInputElement&gt;</span>) =&gt;</span> {
+                <span class="hljs-built_in">this</span>.compoOneValue = event.target.value;
+              };
+            
+              onChangeCompoTwo = <span class="hljs-function">(<span class="hljs-params">event: React.FormEvent&lt;HTMLInputElement&gt;</span>) =&gt;</span> {
+                <span class="hljs-built_in">this</span>.compoTwoValue = event.target.value;
+              };
+            
+              render() {
+                <span class="hljs-keyword">return</span>(
+                  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+                    <span class="hljs-tag">&lt;<span class="hljs-name">Child1</span> 
+                      <span class="hljs-attr">value</span>=<span class="hljs-string">{this.compoOneValue}</span>
+                      <span class="hljs-attr">onChangeValue</span>=<span class="hljs-string">{this.onChangeCompoOne}</span>
+                    /&gt;</span>
+                    <span class="hljs-tag">&lt;<span class="hljs-name">Child2</span>
+                      <span class="hljs-attr">value</span>=<span class="hljs-string">{this.compoTwoValue}</span>
+                      <span class="hljs-attr">onChangeValue</span>=<span class="hljs-string">{this.onChangeCompoTwo}</span>
+                    /&gt;</span>
+                  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+                )
+              }
+            }
+            </pre>
+            <ul>
+              <li>
+                난 보통 위와 같은 페이지 구성을 할 때, 위와 같은 구성으로 만들 것 같다.
+              </li>
+              <li>
+                데이터를 컨트롤 해야하기 때문에 데이터는 Parent 컴포넌트에서 관리하고, Child의 Props로 넘겨줄 것이다.
+              </li>
+            </ul>
+            <h2>
+              [Test1] 부모만 PureComponent (자식들은 일반 Component)
+            </h2>
+            <p>
+              <img src="2020-06-02__11.15.36.png" alt="2020-06-02__11.15.36.png"/>
+            </p>
+            <ul>
+              <li>
+                부모만 PureComponent일 때는 똑같은 상황(자식 한명이 바뀌어도 모두 Re-render)이 발생 된다.
+              </li>
+            </ul>
+            <h2>
+              [Test2] 자식1만 PureComponent (부모, 자식2 일반 Component)
+            </h2>
+            <p>
+              <img src="2020-06-02__11.18.18.png" alt="2020-06-02__11.18.18.png"/>
+            </p>
+            <ul>
+              <li>
+                PureComponent 자식1 을 변경 했더니, 다른 자식도 Re-render 되었다.
+              </li>
+            </ul>
+            <p>
+              <img src="2020-06-02__11.18.24.png" alt="2020-06-02__11.18.24.png"/>
+            </p>
+            <ul>
+              <li>
+                하지만 자식2를 변경 했더니, PureComponent인 자식1은 Re-render 되지 않았다.
+              </li>
+            </ul>
+            <h2>
+              [Test3] 자식 모두 PureComponent (부모 일반 Component)
+            </h2>
+            <p>
+              <img src="2020-06-02__11.20.31.png" alt="2020-06-02__11.20.31.png"/>
+            </p>
+            <ul>
+              <li>
+                자식 모두 PureComponent로 선언 하니, 서로의 영향을 받지 않았다.
+              </li>
+              <li>
+                PureComponent는 변경 된 점이 있는지 체크하고, Render 여부를 판단하기 때문에 변경이 되지 않은 PureComponent 자식을 Re-render 시키지 않았다.
+              </li>
+            </ul>
+            <h2>
+              [Test4] 모두 PureComponent
+            </h2>
+            <p>
+              <img src="2020-06-02__11.23.09.png" alt="2020-06-02__11.23.09.png"/>
+            </p>
+            <ul>
+              <li>
+                부모 또한, PureComponent 일 때도 `Test3` 과 같은 방식으로 Render 되었다.
+              </li>
+              <li>
+                여기서 우린 **부모 Component를 PureComponent로 설정 하는 것은 `낭비`** 라는 것을 어렴풋이 알 수 있다.
+              </li>
+            </ul>
+            <h2>
+              하지만 의문이 든다.
+            </h2>
+            <ul>
+              <li>
+                부모 Component의 **"부모 Render"** 로그가 꼭 찍혀야하는 건가?
+              </li>
+              <li>
+                자식이 변경 되면, 일단 부모는 Re-render 되어야 할까?
+              </li>
+            </ul>
+            <p>
+              <img src="2020-06-02__11.30.07.png" alt="2020-06-02__11.30.07.png"/>
+            </p>
+            <p>
+              실제 웹페이지 개발을 하다 보면, 위와 같은 예시보다 더 복잡한 구조가 나올 것이다.
+            </p>
+            <h3>
+              우린 어디까지 부모라고 보아야하고, 어디를 PureComponent로 설정해야 할까?
+            </h3>
+            <ul>
+              <li>
+                단순하게 생각하면 같은 계층에 컴포넌트가 존재한다면 PureComponent로 만들 것 같다.
+              </li>
+            </ul>
+            <p>
+              하지만 이 부분은 단순한 문제는 아닌 것 같다. 컴포넌트들의 구조를 짜면서 어디 까지를 그룹화 시킬 것이고, 각 Component들이 어디 까지 영향을 미치게 할지 설계를 하는 부분에서 PureComponent를 정할 수 있을 것이다.
+            </p>
+            <p>
+              이런 문제로
+              <strong>"모르면 PureComponent 써"</strong>
+              라는 말이 나온 것 같다.
+            </p>
+            <p>
+              <strong>[더 많은 비용 발생]</strong>
+              <code>(PureComponent를 쓰지 않아, 무분별한 Re-render가 발생) > (의미 없는 PureComponent들의 얕은 비교 연산)</code>
+            </p>
+            <p>
+              위 조건이 true 일 확률이 더 높기 때문일 것이다.
+            </p>
+            <p>
+              인터넷에 존재하는 한 페이지의 예제로는 PureComponent를 이해하기 쉽지 않기 때문에 글을 여기서 마무리 하고 싶지 않지만, 단순한 예제를 작성만으로
+              <strong>'PureComponent는 이렇게 사용해야합니다!'</strong>
+              를 이해시키긴 힘들 것 같아 여기까지 적어야겠다.
+            </p>
+            <p>
+              하지만 위 TestCase를 이해하게 된다면 어느 Component를 PureComponent로 선언해주어야 할지 알게 될 것이고, 이러한 생각을 할 수 있다면 좀 더 효율적인 구조를 짤 수 있는 생각을 할 수 있게 된다고 믿는다.
+            </p>
+            <h1>
+              결론
+            </h1>
+            <ul>
+              <li>
+                Depth가 깊어지면 깊어질 수록 PureComponent는 단순 하지만 어렵다. 하지만, TestCase를 이해하게 되면 어떻게 동작 되는지 감이 잡힐 것 같다.
+              </li>
+            </ul>
+            - 이해가 되지 않는다면 Component 보단 PureComponent를 쓰자. 굳이 변화를 비교 할 필요없는 Component들이 PureComponent가 되어 비교를 진행하는 연산 보다는 무분별하게 Re-render 되는 비용이 분명 클 것이다.)}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

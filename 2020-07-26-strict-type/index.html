@@ -1,0 +1,308 @@
+<html>
+  <head>
+    <meta charSet="utf-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no"></meta>
+    <link rel="stylesheet" href="../base.css"/>
+    <link rel="stylesheet" href="../markdown.css"/>
+    <link rel="stylesheet" href="../highlight.css"/>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrapper">
+        <nav class="site-nav">
+          <div class="trigger">
+            <a class="page-link" href="../">home</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+          <header class="post-header">
+            <h1 class="post-title">unknown 과 never 활용해보기</h1>
+            <p></p>
+          </header>
+          <div class="articlebox">
+            <div class="markdown-body">
+            <p>
+              Typescript 에서 타입을 다루는 많은 기법들이 있다. Intersction 과 Union 과 같은 일반적인 것부터, Type guards 과 Conditional 과 같이 문법자체가 낯선 것들도 있다. 중요한 것은 이런 많은 장치들이
+              <code>왜</code>
+              필요한가를 알아야 한다는 것이다. 특히
+              <code>unknown</code>
+              과
+              <code>never</code>
+              를 사용하기 위해서는 어떠한 상황에서 필요한지 알고 있으면 많은 도움이 된다.
+            </p>
+            <p>
+              Typescript 를 Javascript 처럼 쓰고 싶으면 모든 타입을 any 로 선언하면 된다. 바꾸어 말하면 any 를 사용하면 Typescript 를 쓰는 이유가 없어진다. Object 도 비슷하다. Object 타입으로 선언된 객체는 모든 클래스인스턴스에 대입이 가능하다. 정말 특별한 목적이 있다면 어쩔수 없지만 대부분의 경우에는 any 그리고 Object 는 타입선언을 번거로움을 피하기 위한 도피처로 선택하는 경우가 많다.
+            </p>
+            <p>
+              타입스크립트를 쓰는 이유는 타입체크를 통해서 오류를 실행전에 발견할 수 있고, 코드를 더욱 효율적이고
+              <em>예쁘게</em>
+              작성할 수 있기 때문이다.  따라서 any 를 사용함으로 이런 이점을 버리는 것은 최대한 막아야 한다.
+            </p>
+            <p>
+              이를 위해서
+              <code>unknown</code>
+              과
+              <code>never</code>
+              를 활용하는 방법을 실제 코드사례를 통해서 알아보도록 하자.
+            </p>
+            <h1>
+              array null element optimize
+            </h1>
+            <p>
+              배열중간에 null 데이터가 있는 경우가 있다. 이것을 특정한 함수를 통과하면 null 을 없앨 수 있을까?
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-keyword">const</span> arr = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-literal">null</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-literal">null</span>];
+            
+            <span class="hljs-keyword">const</span> arrWithoutNull = fn(arr);
+            <span class="hljs-built_in">console</span>.log(arrWithoutNull); <span class="hljs-comment">// [1, 2, 4, 5]</span>
+            </pre>
+            <p>
+              우선 상상할 수 있는 것은 filter 를 사용하는 것이다
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fn</span>(<span class="hljs-params">src: <span class="hljs-built_in">any</span>[]</span>): <span class="hljs-title">any</span>[] </span>{
+                <span class="hljs-keyword">return</span> src.filter(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> item !== <span class="hljs-literal">null</span>);
+            }
+            </pre>
+            <p>
+              자바스크립트였다면 이렇게만 만들어도 충분했을 것이다. 하지만 우리는 타입스크립트니까 any 를 없애보도록 하겠다. 우선 arr 의 타입은
+              <code>(number | null)[]</code>
+              이 된다. 이것을 입력으로 fn 함수를 다시 작성해보자
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fn</span>(<span class="hljs-params">src: (<span class="hljs-built_in">number</span>|<span class="hljs-literal">null</span>)[]</span>): (<span class="hljs-params"><span class="hljs-built_in">number</span>|<span class="hljs-literal">null</span></span>)[] </span>{
+                <span class="hljs-keyword">return</span> src.filter(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> item !== <span class="hljs-literal">null</span>);
+            }
+            </pre>
+            <p>
+              여기서 제네릭을 이용해서 좀 더 범용적인 함수로 업그레이드가 가능하다
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fn</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params">src: T[]</span>): <span class="hljs-title">T</span>[] </span>{
+                <span class="hljs-keyword">return</span> src.filter(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> item !== <span class="hljs-literal">null</span>);
+            }
+            </pre>
+            <p>
+              이제 이 함수는
+              <code>["a", "b", null, "d"]</code>
+              와 같은 입력도  처리할 수 있게 되었다.
+            </p>
+            <p>
+              이렇게 하면 끝난것 같지만 실제로 사용하려고 하면 코드가 예쁘지 않는 문제가 있다. 다음의 상황을 보자
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-keyword">const</span> arr = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-literal">null</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-literal">null</span>];
+            <span class="hljs-keyword">const</span> numToStr = fn(arr).map(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> item.toString());
+            
+            <span class="hljs-built_in">console</span>.log(numToStr); <span class="hljs-comment">// expect [&#x27;1&#x27;, &#x27;2&#x27;, &#x27;4&#x27;, &#x27;5&#x27;] .. but error</span>
+            </pre>
+            <p>
+              위의 코드에서
+              <code>item.toString()</code>
+              에서
+              <strong>
+                <em>"객체가 null 일 수 있습니다"</em>
+              </strong>
+              오류가 발생한다.
+              <code>fn()</code>
+              의 리턴타입이
+              <code>(number|null)[]</code>
+              이기 때문에 item 역시
+              <code>number|null</code>
+              이 되며, null 을 포함한 변수에 아무런 보호장치 없이 접근하면 타입스크립트는 오류를 내기 때문이다. 하지만 우리는 결과값에 null 이 없다는 것을 알고 있다. 그렇다면 어떻게 이 함수를 구성할 수 있을까?
+            </p>
+            <p>
+              여기서 사용되는 것은 never 이다. ( Conditional Type 에 대해서는 여기서 설명하지 않는다. )
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-keyword">type</span> NonNullable&lt;T&gt; = T <span class="hljs-keyword">extends</span> <span class="hljs-literal">null</span> | <span class="hljs-literal">undefined</span> ? <span class="hljs-built_in">never</span> : T;
+            
+            <span class="hljs-keyword">declare</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fn</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params">src: T[]</span>): <span class="hljs-title">NonNullable</span>&lt;<span class="hljs-title">T</span>&gt;[]</span>;
+            </pre>
+            <p>
+              자 실제 상황을 살펴보면
+              <code>type T = number|null</code>
+              이라고 하면NonNullable 은 다음과 같이 해석된다.
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-keyword">type</span> NonNullable&lt;<span class="hljs-built_in">number</span>|undefine&gt; = 
+             (<span class="hljs-built_in">number</span> <span class="hljs-keyword">extends</span> <span class="hljs-literal">null</span> |undefine ? <span class="hljs-built_in">never</span> : <span class="hljs-function"><span class="hljs-params">number</span> =&gt;</span> <span class="hljs-built_in">number</span>)  | 
+             (<span class="hljs-literal">null</span> <span class="hljs-keyword">extends</span> <span class="hljs-literal">null</span> |undefine ? <span class="hljs-built_in">never</span> : <span class="hljs-function"><span class="hljs-params">number</span> =&gt;</span> <span class="hljs-built_in">never</span>) 
+            
+             = <span class="hljs-built_in">number</span> | <span class="hljs-built_in">never</span> = <span class="hljs-built_in">number</span>;
+            </pre>
+            <p>
+              <code>never</code>
+              는 그자체의 의미는 아무런 타입도 아니라는 뜻이다. void 와 혼동될 수 있는데, void 는 "빈값" 이라는 특수한 값을 담을 수 있는 타입이다. never 는 담을 수 있는 타입이 없는데, 이를 명확히 보여주는  예제를 준비하였다.
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">ReturnVoid</span>(<span class="hljs-params"></span>): <span class="hljs-title">void</span> </span>{}
+            
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">ReturnNeverError</span>(<span class="hljs-params"></span>): <span class="hljs-title">never</span> </span>{} <span class="hljs-comment">// 에러: &#x27;never&#x27; 를 반환하는 함수에는 연결 가능한 끝점이 있을 수 없습니다</span>
+            
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">ReturnNeverOk</span>(<span class="hljs-params"></span>): <span class="hljs-title">never</span> </span>{
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>();
+                <span class="hljs-comment">// 이 함수에는 return 이 없기 때문에 리턴타입은 never 가 된다 </span>
+            }
+            </pre>
+            <p>
+              그리고 추가로 Union Type 규칙에 의해서
+              <code>never | void = void</code>
+              가 된다. (
+              <code>never | T = T</code>
+              이기 때문에)
+            </p>
+            <p>
+              이제 함수의 내용을 채워보도록 하자
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fn</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params">src: T[]</span>): <span class="hljs-title">NonNullable</span>&lt;<span class="hljs-title">T</span>&gt;[] </span>{
+                <span class="hljs-keyword">return</span> src.filter(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> item !== <span class="hljs-literal">null</span>); <span class="hljs-comment">// error: T[] 형식은 NonNullable&lt;T&gt;[] 에 할당할 수 없습니다</span>
+            }
+            </pre>
+            <p>
+              T 는 NonNullable<T> 보다 큰 집합이기 때문에
+              <code>NonNullable<T> => T : ok,  T => NonNullable<T> : error</code>
+              가 된다. 여기서 사용할 수 있는 것이 타입을 한정지어주는 타입가드이다
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isNonNullable</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params">src: T</span>): <span class="hljs-title">src</span> <span class="hljs-title">is</span> <span class="hljs-title">NonNullable</span>&lt;<span class="hljs-title">T</span>&gt; </span>{
+              <span class="hljs-keyword">return</span> (src !== <span class="hljs-literal">null</span> &amp;&amp; src !== <span class="hljs-literal">undefined</span>);
+            }
+            
+            <span class="hljs-keyword">let</span> foo: Foo | <span class="hljs-literal">null</span>;
+            <span class="hljs-keyword">if</span> (isNonNullable(foo)) { 
+                <span class="hljs-comment">// foo 는 null 이나 undefined 가 아닌값이다</span>
+                <span class="hljs-comment">// 따라서 멤버 메소드를 호출할때 null 체크를 하지 않아도 타입오류가 발생하지 않는다</span>
+                foo.fn();
+            }
+            </pre>
+            <p>
+              위에서 작성한 타입가드를 이용해서 실제 작성된 코드이다
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isNonNullable</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params">src: T</span>): <span class="hljs-title">src</span> <span class="hljs-title">is</span> <span class="hljs-title">NonNullable</span>&lt;<span class="hljs-title">T</span>&gt; </span>{
+                <span class="hljs-keyword">return</span> (src !== <span class="hljs-literal">null</span> &amp;&amp; src !== <span class="hljs-literal">undefined</span>);
+              }
+            
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">nonNullable</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params">array: T[]</span>): <span class="hljs-title">NonNullable</span>&lt;<span class="hljs-title">T</span>&gt;[] </span>{
+                <span class="hljs-keyword">const</span> initialValue: NonNullable&lt;T&gt;[] = [];
+                <span class="hljs-keyword">return</span> array.reduce(<span class="hljs-function">(<span class="hljs-params">list, item</span>) =&gt;</span> {
+                    <span class="hljs-keyword">if</span> (isNonNullable(item)) {
+                    list.push(item);
+                    }
+                    <span class="hljs-keyword">return</span> list;
+                }, initialValue);
+            }
+            
+            <span class="hljs-keyword">const</span> arr: (<span class="hljs-built_in">number</span> | <span class="hljs-literal">null</span>)[] = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-literal">null</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-literal">null</span>];
+            <span class="hljs-keyword">const</span> arrWithoutNull: <span class="hljs-built_in">number</span>[] = nonNullable(arr);
+            <span class="hljs-built_in">console</span>.log(arrWithoutNull); <span class="hljs-comment">// [1, 2, 4, 5]</span>
+            </pre>
+            <p>
+              어때요. 간단하죠?
+            </p>
+            <h1>
+              숫자 배열의 총합
+            </h1>
+            <p>
+              배열의 총합을 구하는 함수를 만들어보자
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">sum</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params">array: T[]</span>): <span class="hljs-title">number</span> </span>{
+              <span class="hljs-comment">// error : operator &#x27;+&#x27; cannot be applied to types &#x27;number&#x27; and &#x27;T&#x27;</span>
+              <span class="hljs-keyword">return</span> array.reduce(<span class="hljs-function">(<span class="hljs-params">prev, item</span>) =&gt;</span> prev + item, <span class="hljs-number">0</span>); 
+            }
+            </pre>
+            <p>
+              안타깝게도 + 연산자를 T 에 적용할 수 없다면 오류가 난다. + 연산자는 미리 선언된 특별한 타입에만 적용가능하기 때문이다.  이경우에 우리는 위에서 배운 타입가드로 해결할 수 있다
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">sum</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params">array: T[]</span>): <span class="hljs-title">number</span> </span>{
+                <span class="hljs-keyword">return</span> array.reduce(<span class="hljs-function">(<span class="hljs-params">prev, item</span>) =&gt;</span> {
+                    <span class="hljs-keyword">return</span> prev + (isNumber(item) ? item : <span class="hljs-number">0</span>)
+                } , <span class="hljs-number">0</span>); 
+            }
+            
+            
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isNumber</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params">value: T</span>): <span class="hljs-title">value</span> <span class="hljs-title">is</span> <span class="hljs-title">number</span> </span>{  <span class="hljs-comment">// error: </span>
+                <span class="hljs-comment">// A type predicate&#x27;s type must be assignable to its parameter&#x27;s type.</span>
+                <span class="hljs-comment">// Type &#x27;number&#x27; is not assignable to type &#x27;T&#x27;.</span>
+                <span class="hljs-comment">// &#x27;T&#x27; could be instantiated with an arbitrary type which could be unrelated to &#x27;number&#x27;.(2677)</span>
+                <span class="hljs-keyword">return</span> (<span class="hljs-keyword">typeof</span> (value) === <span class="hljs-string">&#x27;number&#x27;</span>);
+            }
+            </pre>
+            <p>
+              T 를 number 로 변환하기 위해서는 number 가 T 의 서브셋이어야 하는데,  T 의 조건이 너무 광범위하기 때문에 이 상황을 특정지을수 없다라는 의미이다.  일반적으로 이런 경우 any 를 사용할 수 있다
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isNumber</span>(<span class="hljs-params">value: <span class="hljs-built_in">any</span></span>): <span class="hljs-title">value</span> <span class="hljs-title">is</span> <span class="hljs-title">number</span> </span>{
+                <span class="hljs-keyword">return</span> (<span class="hljs-keyword">typeof</span> (value) === <span class="hljs-string">&#x27;number&#x27;</span>);
+            }
+            </pre>
+            <p>
+              하지만 우리는 any 를 최대한 없애고 싶다. 그럴때 사용하는 것이
+              <code>unknown</code>
+              이다.
+            </p>
+            <p>
+              <code>unknown</code>
+              은 any 대신에 코드를 좀 더 명확하게 만들어주는 역활을 한다. 다음 코드를 비교해보자
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-keyword">const</span> x: <span class="hljs-built_in">any</span> = <span class="hljs-number">1</span>;
+            <span class="hljs-keyword">const</span> y: unknown = <span class="hljs-number">2</span>;
+            
+            <span class="hljs-built_in">console</span>.log(x.toString()); <span class="hljs-comment">// &#x27;1&#x27;</span>
+            <span class="hljs-built_in">console</span>.log(y.toString()); <span class="hljs-comment">// error: Object is of type &#x27;unknown&#x27;</span>
+            </pre>
+            <p>
+              any 는 위와 같이 프라퍼티나 메소드를 사용하는데 컴파일러가 제한을 두지 않는데, unknown 은 프라퍼티나 메소드를 전혀 사용할 수 없게 지정한다. 이것은 값은 전파하되, 사용은 금지하는 효과를 가져오기 때문에 리팩토링 과정에서 any 와는 다르게 타입을 바꾸었을때 undefined 오류가 나지 않는 이점이 있다.
+            </p>
+            <p>
+              <code>unknown</code>
+              은 어느 타입으로나 변경이 가능한 장점이 있다
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">prettyPrint</span>(<span class="hljs-params">x: unknown</span>): <span class="hljs-title">string</span> </span>{
+              <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Array</span>.isArray(x)) {
+                <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;[&quot;</span> + x.map(prettyPrint).join(<span class="hljs-string">&quot;, &quot;</span>) + <span class="hljs-string">&quot;]&quot;</span>
+              }
+              <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> x === <span class="hljs-string">&quot;string&quot;</span>) {
+                <span class="hljs-keyword">return</span> <span class="hljs-string">`&quot;<span class="hljs-subst">${x}</span>&quot;`</span>
+              }
+              <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> x === <span class="hljs-string">&quot;number&quot;</span>) {
+                <span class="hljs-keyword">return</span> <span class="hljs-built_in">String</span>(x)
+              } 
+              <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;etc.&quot;</span>
+            }
+            </pre>
+            <p>
+              <code>unknown</code>
+              을 이용해서 배열의 숫자들의 합을 구하는 함수를 완성하도록 하자
+            </p>
+            <pre class="hljs codebox">
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isNumber</span>(<span class="hljs-params">src: unknown</span>): <span class="hljs-title">src</span> <span class="hljs-title">is</span> <span class="hljs-title">number</span> </span>{
+              <span class="hljs-keyword">return</span> (<span class="hljs-keyword">typeof</span> (src) === <span class="hljs-string">&#x27;number&#x27;</span>);
+            }
+            
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">sum</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params">array: T[]</span>): <span class="hljs-title">number</span> </span>{
+                <span class="hljs-keyword">return</span> array.reduce(<span class="hljs-function">(<span class="hljs-params">prev, item</span>) =&gt;</span> {
+                    <span class="hljs-keyword">return</span> prev + (isNumber(item) ? item : <span class="hljs-number">0</span>)
+                } , <span class="hljs-number">0</span>); 
+            }
+            <span class="hljs-built_in">console</span>.log(sum([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-literal">null</span>, <span class="hljs-number">3</span>])); <span class="hljs-comment">// 6</span>
+            </pre>
+            again 참 쉽죠?)}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
