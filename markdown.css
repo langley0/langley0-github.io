@@ -45,3 +45,13 @@
 .markdown-body ol, .markdown-body ul {
     padding-left: 2em;
 }
+
+.markdown-body a {
+    color: #0366d6;
+    text-decoration: none;
+}
+
+.markdown-body a:hover {
+    color: #0366d6;
+    text-decoration: underline;
+}
