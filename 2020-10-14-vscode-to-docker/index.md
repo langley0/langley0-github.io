@@ -1,5 +1,5 @@
 ---
-title: Docker Container 안에 소스를 윈도우즈에서 VS Code 로 편집하기
+title: 리눅스 프로젝트, VS Code 로 편집하기
 author: langley
 ---
 

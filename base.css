@@ -5,9 +5,9 @@
 
 body {
     font-family: NanumBarunGothic;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.5em;
-    color: #666;
+    color: #24292e;
     background-color: #fdfdfd;
 }
 
@@ -23,8 +23,8 @@ body {
 }
 
 .wrapper {
-    max-width: -webkit-calc(800px - (50px * 2));
-    max-width: calc(800px - (50px * 2));
+    max-width: -webkit-calc(960px - (50px * 2));
+    max-width: calc(960px - (50px * 2));
     margin-right: auto;
     margin-left: auto;
     padding-right: 50px;
@@ -51,7 +51,7 @@ body {
 }
 
 a {
-    color: #666;
+    color: inherit;
     text-decoration: none;
 }
 
@@ -80,12 +80,12 @@ a:hover {
 
 .header-bar h1 {
     color: #FF3636;
-    font-size: 75px;
+    font-size: 2em;
     font-weight: 600;
 }
 
 .header-bar h2 {
-    font-size: 25px;
+    font-size: 1.5em;
 }
 
 body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, hr, dl, dd, ol, ul, figure {
@@ -118,14 +118,19 @@ hr {
 }
 
 .post-title {
-    font-size: 32px;
+    font-size: 2em;
+    font-weight: 600;
+}
+
+.post-list .post-title {
+    font-size: 1.2em;
     letter-spacing: -1px;
-    line-height: 1;
+    line-height: 1.5;
     font-weight: 500;
 }
 
 .post-meta {
-    font-size: 14px;
+    font-size: 1em;
     color: #828282;
     margin-bottom: 0px;
     margin-top: 8px;
